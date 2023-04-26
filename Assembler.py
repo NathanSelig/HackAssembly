@@ -148,9 +148,7 @@ def initialRun(file):
         i -= moveIAmount
         line = whole_file[i]
         #make a regex that finds // and replaces // and everything to the right with a \n
-        regex = r'\/\/.*'
-        whole_file[i] = re.sub(regex, '\n', line)
-        
+        line = line.split('//')[0].replace(' ', '')
             
         if '(' in line and ')' in line and '@' not in line:
             del whole_file[i]
@@ -185,7 +183,7 @@ def main():
     except:
         print('The format is incorrect expected 2 input arguments but recieved ' + str(len(sys.argv) - 1) + ' arguments')
     
-    filename = infile 
+    filename = 'test.asm' 
     try:
         file = open(filename, 'r')
     except FileNotFoundError as fnfError:

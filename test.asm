@@ -1,5 +1,2 @@
-@hello() // yo comment
-M = 1
-@hello()
-D = M
-//hard comment
+ //hard comment
+M = 1 //comment
