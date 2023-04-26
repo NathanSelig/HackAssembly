@@ -9,7 +9,7 @@ To use the assembler, you'll need to have Python 3 installed on your computer. Y
 Once you have Python installed, you can download the assembler source code from this repository by running:
 
 ```
-git clone https://github.com/username/hack-assembly.git
+git clone https://github.com/NathanSelig/HackAssembly
 ```
 
 ## Usage
@@ -17,12 +17,12 @@ git clone https://github.com/username/hack-assembly.git
 To assemble a Hack Assembly language source file, you can run the following command:
 
 ```
-python assembler.py <input_file.asm> <output_file.hack>
+python Assembler.py <input_file.asm> <output_file.bin>
 ```
 
-Where `<input_file.asm>` is the name of the input file containing the Hack Assembly source code, and `<output_file.hack>` is the name of the output file where the assembled binary code will be written.
+Where `<input_file.asm>` is the name of the input file containing the Hack Assembly source code, and `<output_file.bin>` is the name of the output file where the assembled binary code will be written.
 
-For example, to assemble the `Add.asm` file and produce `Add.hack` as output, you would run:
+For example, to assemble the `Add.asm` file and produce `Add.bin` as output, you would run:
 
 ```
 python assembler.py Add.asm Add.hack
