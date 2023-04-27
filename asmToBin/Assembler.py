@@ -119,6 +119,23 @@ def writeToFile(filename, instructions):
 def has_letter(inputString):
     return any(str(char).isalpha() for char in inputString)
 
+def label_run(file):
+    fileArr = file.readlines()
+    labels = {}
+    moveIamount = 0
+    for i in range(len(fileArr)):
+        i -= moveIamount
+        line = fileArr[i]
+        if '(' in line and ')' in line and '@' not in line:
+            del fileArr[i]
+            moveIamount += 1
+            labels[line.replace('(', '').replace(')', '').strip()] = i
+    return fileArr, labels 
+    
+        
+    
+
+
 def initialRun(file):
     reserverRam = {
         'R0': '0',
@@ -140,21 +157,13 @@ def initialRun(file):
         'SCREEN': '16384',
         'KBD': '24576',
     }
-    labels = {}
+    whole_file, labels  = label_run(file)
     ramSpot = 15
-    moveIAmount = 0
-    whole_file = file.readlines()
     for i in tqdm(range(len(whole_file)), desc='Initial File Cleaning: '):
-        i -= moveIAmount
         line = whole_file[i]
         #make a regex that finds // and replaces // and everything to the right with a \n
         line = line.split('//')[0].replace(' ', '')
             
-        if '(' in line and ')' in line and '@' not in line:
-            del whole_file[i]
-            moveIAmount += 1
-            labels[line.replace('(', '').replace(')', '').strip()] = i
-            continue
         # check for variables
         if '@' in line and  has_letter(line) and line.replace('@', '').replace(' ', '').strip() not in labels:
             if not line.replace('@', '').replace(' ', '').strip() in reserverRam:
@@ -167,12 +176,13 @@ def initialRun(file):
         for key in testDict:
             if key in line:
                 whole_file[i] = f'@{testDict[key]}\n'
-                break
-        whole_file[i] = line.replace(' ', '')
+                break 
+        whole_file[i] = whole_file[i].replace(' ', '')
 
     file.close()
-    file = open('temp.txt', 'w')
+    file = open('asmTobin/temp.txt', 'w')
     file.writelines(whole_file)
+    file.close()
 
 
 
@@ -183,7 +193,8 @@ def main():
     except:
         print('The format is incorrect expected 2 input arguments but recieved ' + str(len(sys.argv) - 1) + ' arguments')
     
-    filename = infile 
+    filename = 'asmToBin/test.asm'
+    
     try:
         file = open(filename, 'r')
     except FileNotFoundError as fnfError:
