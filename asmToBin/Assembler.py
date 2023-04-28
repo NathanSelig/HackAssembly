@@ -193,7 +193,7 @@ def main():
     except:
         print('The format is incorrect expected 2 input arguments but recieved ' + str(len(sys.argv) - 1) + ' arguments')
     
-    filename = 'asmToBin/test.asm'
+    filename = infile 
     
     try:
         file = open(filename, 'r')
