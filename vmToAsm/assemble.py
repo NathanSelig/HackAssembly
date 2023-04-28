@@ -1,6 +1,7 @@
 """ 
 stack from  255-1014
 lcl from    1015
+tmp from    5-12
 
 push constant i
     @i
@@ -10,29 +11,151 @@ push constant i
     M = D
     @R0
     M = M + 1
-
 push local i
     @R1
     D = M
     @i
     A = D + M
-
-
-
-push    [int or var]
-    D = input
+    D = M
     @R0
     A = M
     M = D
     @R0
     M = M + 1
-    
-pop     [int or var]
+push argument  i
+    @R2
+    D = M
+    @i
+    A = D + M
+    D = M
     @R0
-    A = M - 1
-    output = M
+    A = M
+    M = D
     @R0
-
+    M = M + 1
+push temp i
+    @R5
+    D = M
+    @i
+    A = D + M
+    D = M
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+push static i
+    @i
+    D = A
+    @[filename].i
+    D = M
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+push pointer i
+    @i
+    D = A
+    @R3
+    A = A + D
+    A = M
+    D = M
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+push this 
+    @R3
+    D = A
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+push that
+    @R4
+    D = A
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+pop local i
+    @i
+    D = A
+    @R1
+    D = D + M
+    @R13
+    M = D
+    @R0
+    M = M - 1
+    A = M
+    D = M
+    @R13
+    A = M
+    M = D
+pop argument i
+    @i
+    D = A
+    @R5
+    D = D + M
+    @R13
+    M = D
+    @R0
+    M = M - 1
+    A = M
+    D = M
+    @R13
+    A = M
+    M = D
+pop temp i
+    @i
+    D = A
+    @R5
+    D = D + M
+    @R13
+    M = D
+    @R0
+    M = M - 1
+    A = M
+    D = M
+pop static i
+    @R0
+    M = M - 1
+    A = M
+    D = M
+    @[filename].i
+    M = D 
+pop pointer i
+    @i
+    D = A
+    @R3
+    D = A + D
+    @R13
+    M = D
+    @R0
+    M = M - 1
+    A = M
+    D = M
+    @R13
+    A = M
+    M = D
+pop this
+    @R0
+    M = M - 1
+    A = M
+    D = M
+    @R3
+    M = D
+pop that
+    @R0
+    M = M - 1
+    A = M
+    D = M
+    @R4
+    M = D
 #region logic    
 add
     @R0
@@ -166,3 +289,5 @@ not
 #endregion
 
 """
+
+#actual assembler code
