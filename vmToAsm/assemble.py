@@ -300,55 +300,58 @@ def isLogic(line):
     return True
 
 
-
-def toAsm(line, filename):
-    name = filename.split('.') 
+def toAsm(line, filename, i):
+    name = filename.split('.')
     type = line.split()
-    val = type[2]
+    id = i
 
-    pushDict = {
-        'push constant': [f'@{val}', 'D = A', '@R0', 'A = M', 'M = D', '@R0', 'M = M + 1'],
-        'push local': ['@R1', 'D = M', f'@{val}', 'A = D + M', 'D = M', '@R0', 'A = M', 'M = D', '@R0', 'M = M + 1'],
-        'push argument': ['@R2', 'D = M', f'@{val}', 'A = D + M', 'D = M', '@R0', 'A = M', 'M = D', '@R0', 'M = M + 1'],
-        'push temp': ['@R5', 'D = M', f'@{val}', 'A = D + M', 'D = M', '@R0', 'A = M', 'M = D', '@R0', 'M = M + 1'],
-        'push static': [f'@{val}', 'D = A', f'@{name[0]}.{val}', 'D = M', '@R0', 'A = M', 'M = D', '@R0', 'M = M + 1'],
-        'push pointer': [f'@{val}', 'D = A', '@R3', 'A = A + D', 'A = M', 'D = M', '@R0', 'A = M', 'M = D', '@R0', 'M = M + 1']
-    }
-
-    popDict = {
-        'pop local': [f'@{val}', 'D = A', '@R1', 'D = D + M', '@R13', 'M = D', '@R0', 'M = M - 1', 'A = M', 'D = M', '@R13', 'A = M', 'M = D'],
-        'pop argument': [f'@{val}', 'D = A', '@R2', 'D = D + M', '@R13', 'M = D', '@R0', 'M = M - 1', 'A = M', 'D = M', '@R13', 'A = M', 'M = D'],
-        'pop temp': [f'@{val}', 'D = A', '@R5', 'D = D + M', '@R13', 'M = D', '@R0', 'M = M - 1', 'A = M', 'D = M', '@R13', 'A = M', 'M = D'],
-        'pop static': [f'@{val}', 'M = M - 1', 'A = M', 'D = M', f'@{name[0]}.{val}', 'M = D'],
-        'pop pointer': [f'@{val}', 'D = A', '@R3', 'D = A + D', '@R13', 'M = D', '@R0', 'M = M - 1', 'A = M', 'D = M', '@R13', 'A = M', 'M = D'],
-        'pop this': [f'@{val}', 'M = M - 1', 'A = M', 'D = M', '@R3', 'M = D'],
-        'pop that': [f'@{val}', 'M = M - 1', 'A = M', 'D = M', '@R4', 'M = D'],
-    }
 
     logicDict = {
-        'add': ['@R0', 'A = M - 1', 'D = M', 'A = A - 1', 'D = D + M', 'A = A + 1', 'M = 0', 'A = A - 1', 'M = D'],
-        'sub': ['@R0', 'A = M - 1', 'D = M', 'A = A - 1', 'D = D - M', 'A = A + 1', 'M = 0', 'A = A - 1', 'M = D'],
-        'neg': ['@R0', 'A = M - 1', 'M = -M'],
-        'eq' : ['@R0', 'A = M - 1', 'D = M', 'A = A - 1', 'D = D - M','@equal_id', 'D;JEQ', '@R0', 'A = M', 'A = A - 1', 'M = 0', 'A = A - 1', 'M = 0','@R0', 'M = M - 1', '@next_id', '0;JMP', f'(equal_{id})','@R0','A=M', 'A = A - 1', 'M = 0', 'A = A - 1', f'(next_{id})'],
-        'gt' : ['@R0', 'A = M - 1', 'D = M', 'A = A - 1', 'D = D - M','@greater_id', 'D;JGT', '@R0', 'A = M', 'A = A - 1', 'M = 0', 'A = A - 1', 'M = 0','@R0', 'M = M - 1', '@next_id', '0;JMP', f'(greater_{id})','@R0','A=M', 'A = A - 1', 'M = 0', 'A = A - 1', f'(next_{id})'],
-        'lt' : ['@R0', 'A = M - 1', 'D = M', 'A = A - 1', 'D = M - D','@greater_id', 'D;JGT', '@R0', 'A = M', 'A = A - 1', 'M = 0', 'A = A - 1', 'M = 0','@R0', 'M = M - 1', '@next_id', '0;JMP', f'(greater_{id})','@R0','A=M', 'A = A - 1', 'M = 0', 'A = A - 1', f'(next_{id})'],
-        'and': ['@R0', 'A = M - 1', 'D = M', 'A = A - 1', 'M = D & M'],
-        'or': ['@R0', 'A = M - 1', 'D = M', 'A = A - 1', 'M = D | M'],
-        'not': ['@R0', 'A = M - 1', 'M = !M'],
+        'add': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D + M\n', 'A = A + 1\n', 'M = 0\n', 'A = A - 1\n'],
+        'sub': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D - M\n', 'A = A + 1\n', 'M = 0\n', 'A = A - 1\n', 'M = D\n'],
+        'neg': ['@R0\n', 'A = M - 1\n', 'M = -M\n'],
+        'eq': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D - M\n', f'@equal_{id}\n', 'D;JEQ\n', '@R0\n', 'A = M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', 'M = 0\n', '@R0\n', 'M = M - 1\n', f'next_{id}\n', '0;JMP\n', f'(equal_{id})\n', '@R0\n', 'A=M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', f'(next_{id})\n'],
+        'gt': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D - M\n', f'@greater_{id}\n', 'D;JGT\n', '@R0\n', 'A = M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', 'M = 0\n', '@R0\n', 'M = M - 1\n', f'next_{id}\n', '0;JMP\n', f'(greater_{id})\n', '@R0\n', 'A=M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', f'(next_{id})\n'],
+        'lt': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = M - D\n', f'@greater_{id}\n', 'D;JGT\n', '@R0\n', 'A = M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', 'M = 0\n', '@R0\n', 'M = M - 1\n', f'next_{id}\n', '0;JMP\n', f'(greater_{id})\n', '@R0\n', 'A=M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', f'(next_{id})\n'],
+        'and': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'M = D & M\n'],
+        'or': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'M = D | M\n'],
+        'not': ['@R0\n', 'A = M - 1\n', 'M = !M\n'],
     }
 
     if isLogic(line):
-        code =  logicDict[line]
+        code = logicDict[line]
     else:
+        val = type[2]
+        pushDict = {
+            'push constant': [f'@{val}\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
+            'push local': ['@R1\n', 'D = M\n', f'@{val}\n', 'A = D + M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
+            'push argument': ['@R2\n', 'D = M\n', f'@{val}\n', 'A = D + M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
+            'push temp': ['@R5\n', 'D = M\n', f'@{val}\n', 'A = D + M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
+            'push static': [f'@{val}\n', 'D = A\n', f'@{name[0]}.{val}\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
+            'push pointer': [f'@{val}\n', 'D = A\n', '@R3\n', 'A = A + D\n', 'A = M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n']
+        }
+        popDict = {
+            'pop local': [f'@{val}\n', 'D = A\n', '@R1\n', 'D = D + M\n', '@R13\n', 'M = D\n', '@R0\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R13\n', 'A = M\n', 'M = D\n'],
+            'pop argument': [f'@{val}\n', 'D = A\n', '@R2\n', 'D = D + M\n', '@R13\n', 'M = D\n', '@R0\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R13\n', 'A = M\n', 'M = D\n'],
+            'pop temp': [f'@{val}\n', 'D = A\n', '@R5\n', 'D = D + M\n', '@R13\n', 'M = D\n', '@R0\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R13\n', 'A = M\n', 'M = D\n'],
+            'pop static': [f'@{val}\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', f'@{name[0]}.{val}\n', 'M = D\n'],
+            'pop pointer': [f'@{val}\n', 'D = A\n', '@R3\n', 'D = A + D\n', '@R13\n', 'M = D\n', '@R0\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R13\n', 'A = M\n', 'M = D\n'],
+            'pop this': [f'@{val}\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R3\n', 'M = D\n'],
+            'pop that': [f'@{val}\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R4\n', 'M = D\n'],
+        }
+        
         if type[0] == 'push':
-            code =  pushDict[type[0] + ' ' + type[1]]
+            code = pushDict[type[0] + ' ' + type[1]]
         elif type[0] == 'pop':
             code = popDict[type[0] + ' ' + type[1]]
-    print('\n'.join(code))
+    return code
 
-
-toAsm('push static 5', 'test.vm')
-
+def setupAsm():
+    sp = ['@256\n', 'D=A\n', '@R0\n', 'M=D\n']
+    lcl = ['@1015\n' , 'D=A\n', '@R1\n', 'M=D\n']
+    arg = ['@1016\n', 'D=A\n', '@R2\n', 'M=D\n'] 
+     
+    return sp + lcl
 
 
 def main():
@@ -358,11 +361,32 @@ def main():
         print('The format is incorrect expected 2 input arguments but recieved ' +
               str(len(sys.argv) - 1) + ' arguments')
 
-    filename = 'test.vm'
-
+    filename = 'vmToAsm/test.vm' 
+    
     try:
         file = open(filename, 'r')
     except FileNotFoundError as fnfError:
         print('File not found')
         print(fnfError)
         print('Make sure you don\'t have any typos')
+        
+    asmInstructions = setupAsm()
+    wholefile = file.readlines()
+    for i in range(len(wholefile)):
+        line = wholefile[i] 
+        intruction = toAsm(line, filename, i)
+        asmInstructions += intruction
+        
+    file.close()
+    try:
+        outfile = open('test.asm', 'w')
+        outfile.writelines(asmInstructions)
+        outfile.close()
+        print('Assembly successful')
+        print('Output file is ' + outfile)
+    except FileNotFoundError as fnfError:
+        print('File not found')
+        print(fnfError)
+        print('Make sure you don\'t have any typos')
+        
+main()
