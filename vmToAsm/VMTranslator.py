@@ -304,7 +304,7 @@ def toAsm(line, filename, i):
     name = filename.split('.')
     type = line.split()
     id = i
-
+    code[0] = f'//{line}\n'
     logicDict = {
         'add': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D + M\n', 'A = A + 1\n', 'M = 0\n', 'A = A - 1\n' , 'M = D\n' '@R0\n' , 'M = M -1\n'],
         'sub': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D - M\n', 'A = A + 1\n', 'M = 0\n', 'A = A - 1\n', 'M = D\n'],
