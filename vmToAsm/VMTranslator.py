@@ -321,14 +321,18 @@ def toAsm(line, filename, i):
         code = logicDict[line.strip('\n')]
     else:
         val = type[2]
+        
         pushDict = {
             'push constant': [f'@{val}\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
             'push local': ['@R1\n', 'D = M\n', f'@{val}\n', 'A = D + M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
             'push argument': ['@R2\n', 'D = M\n', f'@{val}\n', 'A = D + M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
             'push temp': ['@R5\n', 'D = M\n', f'@{val}\n', 'A = D + M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
-            'push static': [f'@{val}\n', 'D = A\n', f'@{name[0]}.{val}\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
-            'push pointer': [f'@{val}\n', 'D = A\n', '@R3\n', 'A = A + D\n', 'A = M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n']
+            'push static': [f'@{name[0]}.{val}\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
+            'push pointer': [f'@{val}\n', 'D = A\n', '@R3\n', 'A = A + D\n', 'A = M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
+            'push this': ['@R3\n', 'D = A\n', 'A = M\n' , 'M = D\n' , '@R0\n' , 'M = M + 1\n'],
+            'push that': ['@R4\n', 'D = A\n', 'A = M\n' , 'M = D\n' , '@R0\n' , 'M = M + 1\n'],
         }
+        
         popDict = {
             'pop local': [f'@{val}\n', 'D = A\n', '@R1\n', 'D = D + M\n', '@R13\n', 'M = D\n', '@R0\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R13\n', 'A = M\n', 'M = D\n'],
             'pop argument': [f'@{val}\n', 'D = A\n', '@R2\n', 'D = D + M\n', '@R13\n', 'M = D\n', '@R0\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R13\n', 'A = M\n', 'M = D\n'],
