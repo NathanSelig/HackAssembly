@@ -292,6 +292,7 @@ not
 
 goto labelName
     @labelName
+    0;JMP
 label labelName
     (labelName)
 if-goto label
@@ -300,9 +301,11 @@ if-goto label
     D = M
     @label
     D;JNE
+    
+
 """
-import sys
 # actual assembler code
+import sys
 
 
 def isLogic(line):
@@ -331,7 +334,7 @@ def toAsm(line, filename, i):
 
     if isLogic(line):
         code = logicDict[line.strip('\n')]
-    else:
+    elif line[0] == 'p':
         val = type[2]
         
         pushDict = {
@@ -359,6 +362,18 @@ def toAsm(line, filename, i):
             code = pushDict[type[0] + ' ' + type[1]]
         elif type[0] == 'pop':
             code = popDict[type[0] + ' ' + type[1]]
+    else:
+        if 'goto' in line:
+            code = ['@' + line.strip('\n').split()[1] + '\n', '0;JMP\n']
+        if 'label' in line:
+            code = ['(' + line.strip('\n').split()[1] + ')\n']
+        if 'if-goto' in line:
+            code = ['@R0\n', 'A = M - 1\n', 'D = M\n', f'@{type[1]}\n', 'D;JNE\n']
+            
+            
+            
+        
+        
     return code
 
 def setupAsm():
