@@ -288,6 +288,18 @@ not
     M = !M
 #endregion
 
+#region branching
+
+goto labelName
+    @labelName
+label labelName
+    (labelName)
+if-goto label
+    @R0
+    A = M
+    D = M
+    @label
+    D;JNE
 """
 import sys
 # actual assembler code
