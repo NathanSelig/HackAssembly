@@ -1,4 +1,4 @@
-""" 
+f""" 
 stack from  255-1014
 lcl from    1015
 tmp from    5-12
@@ -301,8 +301,21 @@ if-goto label
     D = M
     @label
     D;JNE
-    
+   
 
+
+ 
+function functionName nVars
+    (functionName)
+        [
+            @R0
+            A = M
+            M = 0
+            @R0
+            M = M + 1
+        ]
+
+     
 """
 # actual assembler code
 import sys
@@ -310,16 +323,27 @@ import sys
 
 def isLogic(line):
     # if the line starts with a p return False
-    if line[0] == 'p':
-        return False
-    return True
+    logicVals = [
+        'add',
+        'sub',
+        'neg',
+        'eq',
+        'gt',
+        'lt',
+        'and',
+        'or',
+        'not'
+    ]
+    if line in logicVals:
+        return True
+    return False 
 
 
 def toAsm(line, filename, i):
     name = filename.split('.')
     type = line.split()
     id = i
-    code[0] = f'//{line}\n'
+    code = [] 
     logicDict = {
         'add': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D + M\n', 'A = A + 1\n', 'M = 0\n', 'A = A - 1\n' , 'M = D\n' '@R0\n' , 'M = M -1\n'],
         'sub': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D - M\n', 'A = A + 1\n', 'M = 0\n', 'A = A - 1\n', 'M = D\n'],
@@ -369,8 +393,15 @@ def toAsm(line, filename, i):
             code = ['(' + line.strip('\n').split()[1] + ')\n']
         if 'if-goto' in line:
             code = ['@R0\n', 'A = M - 1\n', 'D = M\n', f'@{type[1]}\n', 'D;JNE\n']
-            
-            
+        if 'function' in line:
+            code = [f'({type[1]})\n']
+            for i in range(int(type[2])):
+                code.append('@R0\n')
+                code.append('A = M\n')
+                code.append('M = 0\n')
+                code.append('@R0\n')
+                code.append('M = M + 1\n') 
+           
             
         
         
@@ -393,7 +424,7 @@ def main():
         print('The format is incorrect expected 2 input arguments but recieved ' +
               str(len(sys.argv) - 1) + ' arguments')
 
-    filename = infile 
+    filename = 'vmToAsm/test.vm' 
     
     try:
         file = open(filename, 'r')
@@ -411,7 +442,7 @@ def main():
     asmInstructions += fileEnd() 
     file.close()
     try:
-        outfile = open(outfile, 'w')
+        outfile = open('vmToAsm/test.asm', 'w')
         outfile.writelines(asmInstructions)
         outfile.close()
         print('Assembly successful')
