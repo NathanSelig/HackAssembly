@@ -1,4 +1,4 @@
-f""" 
+""" 
 stack from  255-1014
 lcl from    1015
 tmp from    5-12
@@ -297,14 +297,11 @@ label labelName
     (labelName)
 if-goto label
     @R0
-    A = M
+    A = M - 1
     D = M
     @label
     D;JNE
-   
 
-
- 
 function functionName nVars
     (functionName)
         [
@@ -314,7 +311,98 @@ function functionName nVars
             @R0
             M = M + 1
         ]
-
+call functionName nArgs
+    @nArgs
+    D = A
+    @R0
+    D = M - D
+    @13 //place holder of new args 
+    M = D
+    @returnAddress
+    D = A
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+    @LCL
+    D = M
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+    @ARG
+    D = M
+    @R0
+    A = M
+    M = D
+    @13
+    D = M
+    @ARG
+    M = D
+    @R0
+    M = M + 1
+    @THIS
+    D = M
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+    @THAT
+    D = M
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+    D = M
+    @R1
+    M = D
+    (returnAddress) 
+return 
+    @R1
+    D = M
+    @13 //endframe temp var
+    M = D
+    @R0
+    A = M - 1
+    D = M
+    @R2
+    A = M
+    M = D
+    D = A
+    @R0
+    M = A + 1
+    @13
+    A = M - 1
+    D = M
+    @THAT
+    M = D
+    @2
+    D = A
+    @13
+    D = M - D
+    @THIS
+    M = D
+    @3
+    D = A
+    @13
+    D = M - D
+    @ARG
+    M = D
+    @4
+    D = A
+    @13
+    D = M - D
+    @LCL
+    M = D
+    @5
+    D = A
+    @13
+    A = M - D
+    0;jmp
      
 """
 # actual assembler code
@@ -401,6 +489,9 @@ def toAsm(line, filename, i):
                 code.append('M = 0\n')
                 code.append('@R0\n')
                 code.append('M = M + 1\n') 
+        if 'call' in line:
+            
+            
            
             
         
