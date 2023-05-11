@@ -490,7 +490,58 @@ def toAsm(line, filename, i):
                 code.append('@R0\n')
                 code.append('M = M + 1\n') 
         if 'call' in line:
-            
+            nArgs = type[2]
+            code = [f'@{nArgs}\n',  'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', '@returnAddress\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@LCL\n', 'D = M\n', '@R0\n']
+             
+    @nArgs
+    D = A
+    @R0
+    D = M - D
+    @13 //place holder of new args 
+    M = D
+    @returnAddress
+    D = A
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+    @LCL
+    D = M
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+    @ARG
+    D = M
+    @R0
+    A = M
+    M = D
+    @13
+    D = M
+    @ARG
+    M = D
+    @R0
+    M = M + 1
+    @THIS
+    D = M
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+    @THAT
+    D = M
+    @R0
+    A = M
+    M = D
+    @R0
+    M = M + 1
+    D = M
+    @R1
+    M = D
+    (returnAddress) 
             
            
             
