@@ -424,31 +424,31 @@ def isLogic(line):
     ]
     if line in logicVals:
         return True
-    return False 
+    return False
 
 
 def toAsm(line, filename, i):
     name = filename.split('.')
     type = line.split()
     id = i
-    code = [] 
+    code = []
     logicDict = {
-        'add': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D + M\n', 'A = A + 1\n', 'M = 0\n', 'A = A - 1\n' , 'M = D\n' '@R0\n' , 'M = M -1\n'],
+        'add': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D + M\n', 'A = A + 1\n', 'M = 0\n', 'A = A - 1\n', 'M = D\n' '@R0\n', 'M = M -1\n'],
         'sub': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D - M\n', 'A = A + 1\n', 'M = 0\n', 'A = A - 1\n', 'M = D\n'],
         'neg': ['@R0\n', 'A = M - 1\n', 'M = -M\n'],
         'eq': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D - M\n', f'@equal_{id}\n', 'D;JEQ\n', '@R0\n', 'A = M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', 'M = 0\n', f'@next_{id}\n', '0;JMP\n', f'(equal_{id})\n', '@R0\n', 'A=M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', 'M = 1\n',  f'(next_{id})\n', '@R0\n', 'M = M - 1\n'],
         'gt': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = D - M\n', f'@greater_{id}\n', 'D;JGT\n', '@R0\n', 'A = M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', 'M = 0\n', '@R0\n', 'M = M - 1\n', f'@next_{id}\n', '0;JMP\n', f'(greater_{id})\n', '@R0\n', 'A=M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', f'(next_{id})\n'],
         'lt': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'D = M - D\n', f'@greater_{id}\n', 'D;JGT\n', '@R0\n', 'A = M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', 'M = 0\n', '@R0\n', 'M = M - 1\n', f'@next_{id}\n', '0;JMP\n', f'(greater_{id})\n', '@R0\n', 'A=M\n', 'A = A - 1\n', 'M = 0\n', 'A = A - 1\n', f'(next_{id})\n'],
         'and': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'M = D & M\n'],
-        'or': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'M = D | M\n' , '@R0\n' ,'M = M - 1\n'],
-        'not': ['@R0\n', 'A = M - 1\n', 'M = !M\n' ],
+        'or': ['@R0\n', 'A = M - 1\n', 'D = M\n', 'A = A - 1\n', 'M = D | M\n', '@R0\n', 'M = M - 1\n'],
+        'not': ['@R0\n', 'A = M - 1\n', 'M = !M\n'],
     }
 
     if isLogic(line):
         code = logicDict[line.strip('\n')]
     elif line[0] == 'p':
         val = type[2]
-        
+
         pushDict = {
             'push constant': [f'@{val}\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
             'push local': ['@R1\n', 'D = M\n', f'@{val}\n', 'A = D + M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
@@ -456,10 +456,10 @@ def toAsm(line, filename, i):
             'push temp': ['@R5\n', 'D = M\n', f'@{val}\n', 'A = D + M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
             'push static': [f'@{name[0]}.{val}\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
             'push pointer': [f'@{val}\n', 'D = A\n', '@R3\n', 'A = A + D\n', 'A = M\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
-            'push this': ['@R3\n', 'D = A\n', 'A = M\n' , 'M = D\n' , '@R0\n' , 'M = M + 1\n'],
-            'push that': ['@R4\n', 'D = A\n', 'A = M\n' , 'M = D\n' , '@R0\n' , 'M = M + 1\n'],
+            'push this': ['@R3\n', 'D = A\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
+            'push that': ['@R4\n', 'D = A\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n'],
         }
-        
+
         popDict = {
             'pop local': [f'@{val}\n', 'D = A\n', '@R1\n', 'D = D + M\n', '@R13\n', 'M = D\n', '@R0\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R13\n', 'A = M\n', 'M = D\n'],
             'pop argument': [f'@{val}\n', 'D = A\n', '@R2\n', 'D = D + M\n', '@R13\n', 'M = D\n', '@R0\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R13\n', 'A = M\n', 'M = D\n'],
@@ -469,7 +469,7 @@ def toAsm(line, filename, i):
             'pop this': [f'@{val}\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R3\n', 'M = D\n'],
             'pop that': [f'@{val}\n', 'M = M - 1\n', 'A = M\n', 'D = M\n', '@R4\n', 'M = D\n'],
         }
-        
+
         if type[0] == 'push':
             code = pushDict[type[0] + ' ' + type[1]]
         elif type[0] == 'pop':
@@ -480,7 +480,8 @@ def toAsm(line, filename, i):
         if 'label' in line:
             code = ['(' + line.strip('\n').split()[1] + ')\n']
         if 'if-goto' in line:
-            code = ['@R0\n', 'A = M - 1\n', 'D = M\n', f'@{type[1]}\n', 'D;JNE\n']
+            code = ['@R0\n', 'A = M - 1\n',
+                    'D = M\n', f'@{type[1]}\n', 'D;JNE\n']
         if 'function' in line:
             code = [f'({type[1]})\n']
             for i in range(int(type[2])):
@@ -488,76 +489,30 @@ def toAsm(line, filename, i):
                 code.append('A = M\n')
                 code.append('M = 0\n')
                 code.append('@R0\n')
-                code.append('M = M + 1\n') 
-        if 'call' in line:
+                code.append('M = M + 1\n')
+        if 'call' in line:     
             nArgs = type[2]
-            code = [f'@{nArgs}\n',  'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', '@returnAddress\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@LCL\n', 'D = M\n', '@R0\n']
-             
-    @nArgs
-    D = A
-    @R0
-    D = M - D
-    @13 //place holder of new args 
-    M = D
-    @returnAddress
-    D = A
-    @R0
-    A = M
-    M = D
-    @R0
-    M = M + 1
-    @LCL
-    D = M
-    @R0
-    A = M
-    M = D
-    @R0
-    M = M + 1
-    @ARG
-    D = M
-    @R0
-    A = M
-    M = D
-    @13
-    D = M
-    @ARG
-    M = D
-    @R0
-    M = M + 1
-    @THIS
-    D = M
-    @R0
-    A = M
-    M = D
-    @R0
-    M = M + 1
-    @THAT
-    D = M
-    @R0
-    A = M
-    M = D
-    @R0
-    M = M + 1
-    D = M
-    @R1
-    M = D
-    (returnAddress) 
-            
-           
-            
-        
-        
+            code = [f'@{nArgs}\n',  'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', '@returnAddress\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@LCL\n', 'D = M\n', '@R0\n',  'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@ARG\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R13\n', 'D = M\n', '@ARG\n' , 'M = D\n' , '@R0\n' , 'M = M + 1\n',  '@THIS\n' , 'D = M\n', '@R0\n' , 'A = M\n' , 'M = D\n', '@R0\n' , 'M = M + 1\n',  '@THAT\n' , 'D = M\n', '@R0\n' ,   'A = M\n' , 'M = D\n', '@R0\n', 'M = M + 1\n', 'D = M\n' ,'@R1\n' , 'M = D\n', '(returnAddress)']
+        if 'return' in line:
+            code = ['@R1\n', 'D = M\n', '@13\n', 'M = D\n', '@R0\n', 'A = M - 1\n', 'D = M\n', '@R2\n' 'A = M\n', 'M = D\n', 'D = A\n', '@R0\n', 'M = A + 1\n', '@13\n', 'A = M - 1\n', 'D = M\n' , '@THAT\n', 'M = D\n', '@2\n',  'D = A\n' , '@13\n' , 'D = M - D\n', '@THIS\n' , 'M = D\n', '@3\n', 'D = A\n' , '@13\n' , 'D = M - D\n', '@ARG\n', 'M = D\n', '@4\n', 'D = A\n' , '@13\n' , 'D = M - D\n', '@LCL\n', 'M = D\n', '@5\n',  'D = A\n',  '@13\n' , 'A = M - D\n', '0;JMP\n']
+                                                                                                                                                                        
+                                                                            
+    
+
     return code
+
 
 def setupAsm():
     sp = ['@256\n', 'D=A\n', '@R0\n', 'M=D\n']
-    lcl = ['@1015\n' , 'D=A\n', '@R1\n', 'M=D\n']
-    arg = ['@2047\n', 'D=A\n', '@R2\n', 'M=D\n'] 
-     
+    lcl = ['@1015\n', 'D=A\n', '@R1\n', 'M=D\n']
+    arg = ['@2047\n', 'D=A\n', '@R2\n', 'M=D\n']
+
     return sp + lcl + arg
+
 
 def fileEnd():
     return ['(END)\n', '@END\n', '0;JMP\n']
+
 
 def main():
     try:
@@ -566,22 +521,22 @@ def main():
         print('The format is incorrect expected 2 input arguments but recieved ' +
               str(len(sys.argv) - 1) + ' arguments')
 
-    filename = 'vmToAsm/test.vm' 
-    
+    filename = 'vmToAsm/test.vm'
+
     try:
         file = open(filename, 'r')
     except FileNotFoundError as fnfError:
         print('File not found')
         print(fnfError)
         print('Make sure you don\'t have any typos')
-        
+
     asmInstructions = setupAsm()
     wholefile = file.readlines()
     for i in range(len(wholefile)):
-        line = wholefile[i] 
+        line = wholefile[i]
         intruction = toAsm(line, filename, i)
         asmInstructions += intruction
-    asmInstructions += fileEnd() 
+    asmInstructions += fileEnd()
     file.close()
     try:
         outfile = open('vmToAsm/test.asm', 'w')
@@ -592,5 +547,6 @@ def main():
         print('File not found')
         print(fnfError)
         print('Make sure you don\'t have any typos')
-        
+
+
 main()
