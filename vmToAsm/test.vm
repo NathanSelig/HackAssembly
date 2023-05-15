@@ -1,1 +1,1 @@
-function test 2
+call Sys.init 0

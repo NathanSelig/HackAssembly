@@ -325,21 +325,21 @@ call functionName nArgs
     M = D
     @R0
     M = M + 1
-    @LCL
+    @R0
     D = M
     @R0
     A = M
     M = D
     @R0
     M = M + 1
-    @ARG
+    @R2
     D = M
     @R0
     A = M
     M = D
     @13
     D = M
-    @ARG
+    @R2
     M = D
     @R0
     M = M + 1
@@ -390,13 +390,13 @@ return
     D = A
     @13
     D = M - D
-    @ARG
+    @R2
     M = D
     @4
     D = A
     @13
     D = M - D
-    @LCL
+    @R0
     M = D
     @5
     D = A
@@ -492,11 +492,11 @@ def toAsm(line, filename, i):
                 code.append('M = M + 1\n')
         if 'call' in line:     
             nArgs = type[2]
-            code = [f'@{nArgs}\n',  'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', '@returnAddress\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@LCL\n', 'D = M\n', '@R0\n',  'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@ARG\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R13\n', 'D = M\n', '@ARG\n' , 'M = D\n' , '@R0\n' , 'M = M + 1\n',  '@THIS\n' , 'D = M\n', '@R0\n' , 'A = M\n' , 'M = D\n', '@R0\n' , 'M = M + 1\n',  '@THAT\n' , 'D = M\n', '@R0\n' ,   'A = M\n' , 'M = D\n', '@R0\n', 'M = M + 1\n', 'D = M\n' ,'@R1\n' , 'M = D\n', '(returnAddress)']
+            funcName = type[1].split('.')[1]
+            code = [f'@{nArgs}\n',  'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', f'@returnAddress_{type[1]}\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R0\n', 'D = M\n', '@R0\n',  'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R2\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R13\n', 'D = M\n', '@R2\n' , 'M = D\n' , '@R0\n' , 'M = M + 1\n',  '@THIS\n' , 'D = M\n', '@R0\n' , 'A = M\n' , 'M = D\n', '@R0\n' , 'M = M + 1\n',  '@THAT\n' , 'D = M\n', '@R0\n' ,   'A = M\n' , 'M = D\n', '@R0\n', 'M = M + 1\n', 'D = M\n' ,'@R1\n' , 'M = D\n', f'(returnAddress_{type[1]})\n' , f'@{funcName}\n', '0;JMP\n']
         if 'return' in line:
-            code = ['@R1\n', 'D = M\n', '@13\n', 'M = D\n', '@R0\n', 'A = M - 1\n', 'D = M\n', '@R2\n' 'A = M\n', 'M = D\n', 'D = A\n', '@R0\n', 'M = A + 1\n', '@13\n', 'A = M - 1\n', 'D = M\n' , '@THAT\n', 'M = D\n', '@2\n',  'D = A\n' , '@13\n' , 'D = M - D\n', '@THIS\n' , 'M = D\n', '@3\n', 'D = A\n' , '@13\n' , 'D = M - D\n', '@ARG\n', 'M = D\n', '@4\n', 'D = A\n' , '@13\n' , 'D = M - D\n', '@LCL\n', 'M = D\n', '@5\n',  'D = A\n',  '@13\n' , 'A = M - D\n', '0;JMP\n']
-                                                                                                                                                                        
-                                                                            
+            code = ['@R1\n', 'D = M\n', '@13\n', 'M = D\n', '@R0\n', 'A = M - 1\n', 'D = M\n', '@R2\n' 'A = M\n', 'M = D\n', 'D = A\n', '@R0\n', 'M = A + 1\n', '@13\n', 'A = M - 1\n', 'D = M\n' , '@THAT\n', 'M = D\n', '@2\n',  'D = A\n' , '@13\n' , 'D = M - D\n', '@THIS\n' , 'M = D\n', '@3\n', 'D = A\n' , '@13\n' , 'D = M - D\n', '@R2\n', 'M = D\n', '@4\n', 'D = A\n' , '@13\n' , 'D = M - D\n', '@R0\n', 'M = D\n', '@5\n',  'D = A\n',  '@13\n' , 'A = M - D\n', '0;JMP\n']
+                                                                                                                                                                                                                                                    
     
 
     return code
@@ -504,10 +504,10 @@ def toAsm(line, filename, i):
 
 def setupAsm():
     sp = ['@256\n', 'D=A\n', '@R0\n', 'M=D\n']
-    lcl = ['@1015\n', 'D=A\n', '@R1\n', 'M=D\n']
-    arg = ['@2047\n', 'D=A\n', '@R2\n', 'M=D\n']
+    
+    
 
-    return sp + lcl + arg
+    return sp
 
 
 def fileEnd():
