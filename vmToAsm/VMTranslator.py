@@ -490,24 +490,27 @@ def toAsm(line, filename, i):
                 code.append('M = 0\n')
                 code.append('@R0\n')
                 code.append('M = M + 1\n')
-        if 'call' in line:     
+        if 'call' in line:
             nArgs = type[2]
             funcName = type[1].split('.')[1]
-            code = [f'@{nArgs}\n',  'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', f'@returnAddress_{type[1]}\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R0\n', 'D = M\n', '@R0\n',  'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R2\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R13\n', 'D = M\n', '@R2\n' , 'M = D\n' , '@R0\n' , 'M = M + 1\n',  '@THIS\n' , 'D = M\n', '@R0\n' , 'A = M\n' , 'M = D\n', '@R0\n' , 'M = M + 1\n',  '@THAT\n' , 'D = M\n', '@R0\n' ,   'A = M\n' , 'M = D\n', '@R0\n', 'M = M + 1\n', 'D = M\n' ,'@R1\n' , 'M = D\n', f'(returnAddress_{type[1]})\n' , f'@{funcName}\n', '0;JMP\n']
+            code = [f'@{nArgs}\n',  'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', f'@returnAddress_{type[1]}\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R0\n', 'D = M\n', '@R0\n',  'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R2\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R13\n',
+                    'D = M\n', '@R2\n', 'M = D\n', '@R0\n', 'M = M + 1\n',  '@THIS\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n',  '@THAT\n', 'D = M\n', '@R0\n',   'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', 'D = M\n', '@R1\n', 'M = D\n', f'@{funcName}\n', '0;JMP\n', f'(returnAddress_{type[1]})\n']
         if 'return' in line:
-            code = ['@R1\n', 'D = M\n', '@13\n', 'M = D\n', '@R0\n', 'A = M - 1\n', 'D = M\n', '@R2\n' 'A = M\n', 'M = D\n', 'D = A\n', '@R0\n', 'M = A + 1\n', '@13\n', 'A = M - 1\n', 'D = M\n' , '@THAT\n', 'M = D\n', '@2\n',  'D = A\n' , '@13\n' , 'D = M - D\n', '@THIS\n' , 'M = D\n', '@3\n', 'D = A\n' , '@13\n' , 'D = M - D\n', '@R2\n', 'M = D\n', '@4\n', 'D = A\n' , '@13\n' , 'D = M - D\n', '@R0\n', 'M = D\n', '@5\n',  'D = A\n',  '@13\n' , 'A = M - D\n', '0;JMP\n']
-                                                                                                                                                                                                                                                    
-    
+            code = ['@R1\n', 'D = M\n', '@13\n', 'M = D\n', '@R0\n', 'A = M - 1\n', 'D = M\n', '@R2\n' 'A = M\n', 'M = D\n', 'D = A\n', '@R0\n', 'M = A + 1\n', '@13\n', 'A = M - 1\n', 'D = M\n', '@THAT\n', 'M = D\n', '@2\n',  'D = A\n',
+                    '@13\n', 'D = M - D\n', '@THIS\n', 'M = D\n', '@3\n', 'D = A\n', '@13\n', 'D = M - D\n', '@R2\n', 'M = D\n', '@4\n', 'D = A\n', '@13\n', 'D = M - D\n', '@R0\n', 'M = D\n', '@5\n',  'D = A\n',  '@13\n', 'A = M - D\n', '0;JMP\n']
 
+    code.append('//' + line + '\n')
+    code = code[-1:] + code[:-1]
+    code.append('//end of ' + line + '\n')
     return code
 
 
 def setupAsm():
-    sp = ['@256\n', 'D=A\n', '@R0\n', 'M=D\n']
-    
-    
+    sp = ['//setup stack pointer\n', '@256\n', 'D=A\n', '@R0\n', 'M=D\n']
+    mainCall = ['//call Main.main 0\n', '@0\n', 'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', '@returnAddress_Sys.init\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R0\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R2\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R13\n', 'D = M\n', '@R2\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@THIS\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@THAT\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', 'D = M\n', '@R1\n', 'M = D\n', '(returnAddress_Main.main)\n', '@init\n', '0;JMP\n', '//end of call Main.main 0\n']
 
-    return sp
+
+    return sp + mainCall
 
 
 def fileEnd():

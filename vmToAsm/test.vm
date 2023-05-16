@@ -1,1 +1,1 @@
-call Sys.init 0
+function main 0
