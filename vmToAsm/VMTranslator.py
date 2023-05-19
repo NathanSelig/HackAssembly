@@ -364,46 +364,52 @@ call functionName nArgs
 return 
     @R1
     D = M
-    @13 //endframe temp var
-    M = D
+    @13
+    M = D // endframe = LCL
+    @5
+    D = A
+    @13
+    D = M - D
+    @14 // return adress
+    M = D // gets return pos
     @R0
     A = M - 1
     D = M
     @R2
     A = M
-    M = D
-    D = A
+    M = D //move return to top previous stack 
+    @R2
+    D = M + 1
     @R0
-    M = A + 1
+    M = D //move stackpointer back
     @13
-    A = M - 1
     D = M
-    @THAT
-    M = D
+    @R4
+    M = D - 1 // that
     @2
     D = A
-    @13
-    D = M - D
-    @THIS
-    M = D
+    @13 
+    M = M - D
+    @R3
+    D = M // this
     @3
     D = A
     @13
-    D = M - D
+    M = M - D
     @R2
-    M = D
+    D = M // arg
     @4
     D = A
     @13
-    D = M - D
-    @R0
-    M = D
-    @5
-    D = A
-    @13
-    A = M - D
-    0;jmp
-     
+    M = M - D
+    @R1
+    M = D // LCL
+    @14
+    0;JMP
+    
+    
+    
+    
 """
 # actual assembler code
 import sys
@@ -444,7 +450,7 @@ def toAsm(line, filename, i):
         'not': ['@R0\n', 'A = M - 1\n', 'M = !M\n'],
     }
 
-    if isLogic(line):
+    if isLogic(line.strip('\n')):
         code = logicDict[line.strip('\n')]
     elif line[0] == 'p':
         val = type[2]
@@ -493,23 +499,20 @@ def toAsm(line, filename, i):
         if 'call' in line:
             nArgs = type[2]
             funcName = type[1].split('.')[1]
-            code = [f'@{nArgs}\n',  'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', f'@returnAddress_{type[1]}\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R0\n', 'D = M\n', '@R0\n',  'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R2\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R13\n',
-                    'D = M\n', '@R2\n', 'M = D\n', '@R0\n', 'M = M + 1\n',  '@THIS\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n',  '@THAT\n', 'D = M\n', '@R0\n',   'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', 'D = M\n', '@R1\n', 'M = D\n', f'@{funcName}\n', '0;JMP\n', f'(returnAddress_{type[1]})\n']
+            code = [f'@{nArgs}\n',  'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', f'@returnAddress_{type[1]}_{id}\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R0\n', 'D = M\n', '@R0\n',  'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R2\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R13\n',
+                    'D = M\n', '@R2\n', 'M = D\n', '@R0\n', 'M = M + 1\n',  '@THIS\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n',  '@THAT\n', 'D = M\n', '@R0\n',   'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', 'D = M\n', '@R1\n', 'M = D\n', f'@{type[1]}\n', '0;JMP\n', f'(returnAddress_{type[1]}_{id})\n']
         if 'return' in line:
-            code = ['@R1\n', 'D = M\n', '@13\n', 'M = D\n', '@R0\n', 'A = M - 1\n', 'D = M\n', '@R2\n' 'A = M\n', 'M = D\n', 'D = A\n', '@R0\n', 'M = A + 1\n', '@13\n', 'A = M - 1\n', 'D = M\n', '@THAT\n', 'M = D\n', '@2\n',  'D = A\n',
+            code = ['@R1\n', 'D = M\n', '@13\n', 'M = D\n', '@R0\n', 'A = M - 1\n', 'D = M\n', '@R2\n' 'A = M\n', 'M = D\n', 'D = A\n', '@R0\n', 'M = M + 1\n', '@13\n', 'A = M - 1\n', 'D = M\n', '@THAT\n', 'M = D\n', '@2\n',  'D = A\n',
                     '@13\n', 'D = M - D\n', '@THIS\n', 'M = D\n', '@3\n', 'D = A\n', '@13\n', 'D = M - D\n', '@R2\n', 'M = D\n', '@4\n', 'D = A\n', '@13\n', 'D = M - D\n', '@R0\n', 'M = D\n', '@5\n',  'D = A\n',  '@13\n', 'A = M - D\n', '0;JMP\n']
 
     code.append('//' + line + '\n')
     code = code[-1:] + code[:-1]
-    code.append('//end of ' + line + '\n')
     return code
 
 
 def setupAsm():
     sp = ['//setup stack pointer\n', '@256\n', 'D=A\n', '@R0\n', 'M=D\n']
-    mainCall = ['//call Main.main 0\n', '@0\n', 'D = A\n', '@R0\n', 'D = M - D\n', '@13\n', 'M = D\n', '@returnAddress_Sys.init\n', 'D = A\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R0\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@R2\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R13\n', 'D = M\n', '@R2\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@THIS\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', '@THAT\n', 'D = M\n', '@R0\n', 'A = M\n', 'M = D\n', '@R0\n', 'M = M + 1\n', 'D = M\n', '@R1\n', 'M = D\n', '(returnAddress_Main.main)\n', '@init\n', '0;JMP\n', '//end of call Main.main 0\n']
-
-
+    mainCall = ['@main\n', '0;JMP\n']
     return sp + mainCall
 
 
