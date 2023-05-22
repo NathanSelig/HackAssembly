@@ -312,55 +312,54 @@ function functionName nVars
             M = M + 1
         ]
 call functionName nArgs
-    @nArgs
+    @returnAdress
+    D = A
+    @R0
+    A = M
+    M = D //push return address
+    @R0
+    M = M + 1
+    @R1
+    D = M
+    @R0
+    A = M
+    M = D //push LCL 
+    @R0
+    M = M + 1
+    @R2
+    D = M
+    @R0
+    A = M
+    M = D //push ARG
+    @R0
+    M = M + 1
+    @R3
+    D = M
+    @R0
+    A = M
+    M = D //push THIS
+    @R0
+    M = M + 1
+    @R4
+    D = M
+    @R0
+    A = M
+    M = D //push THAT
+    @R0
+    M = M + 1
+    @5
     D = A
     @R0
     D = M - D
-    @13 //place holder of new args 
-    M = D
-    @returnAddress
+    @nARGS
+    D = D - A // reposistion args
+    @R0
     D = A
-    @R0
-    A = M
-    M = D
-    @R0
-    M = M + 1
-    @R0
-    D = M
-    @R0
-    A = M
-    M = D
-    @R0
-    M = M + 1
-    @R2
-    D = M
-    @R0
-    A = M
-    M = D
-    @13
-    D = M
-    @R2
-    M = D
-    @R0
-    M = M + 1
-    @THIS
-    D = M
-    @R0
-    A = M
-    M = D
-    @R0
-    M = M + 1
-    @THAT
-    D = M
-    @R0
-    A = M
-    M = D
-    @R0
-    M = M + 1
-    D = M
     @R1
-    M = D
-    (returnAddress) 
+    M = D //LCL = SP
+    @funcname
+    0;JMP
+    (returnAdress)
 return 
     @R1
     D = M
